@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from .models import Document
+from .models import Document, Tag
 
 import pdf2image
 
@@ -10,7 +10,7 @@ def index(request):
 
 def document(request, document_id):
     document = get_object_or_404(Document, id=document_id)
-    return HttpResponse(f"Document {document_id} {document.file.path}")
+    return render(request, 'sdms/document.html', {'document': document, 'tags': Tag.objects.all()})
 
 def preview(request, document_id, page):
     document = get_object_or_404(Document, id=document_id)

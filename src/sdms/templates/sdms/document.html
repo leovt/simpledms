@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Document View</title>
+    <link rel="stylesheet" href="{% static 'sdms/sdms.css' %}">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a>Inbox</a> <span class="badge">2</span>
+        <a>Search</a>
+        <a>Settings</a>
+        <a>Logout</a>
+      </nav>
+    </header>
+    <main>
+      <div id="preview">
+        <img src="{% url 'preview' document.id 1 %}"></img>
+      </div>
+      <div id="attributes">
+        <section>
+          <h1>Document Properties</h1>
+          <p>ID: {{document.id}}</p>
+          <p>Subject: <span class="subject">The subject of the document</span></p>
+          <p>99 pages</p>
+          <p>Date: 2022-02-14</p>
+          <p>Document Type: Letter</p>
+        </section>
+        <section>
+          <h1>Selected Tags</h1>
+          <ul id="tags">
+            {% for tag in document.tags.all %}
+            <li style="background-color:{{tag.fill_color}};color:{{tag.text_color}};border-color:{{tag.text_color}}">{{tag}}</li>
+            {% endfor %}
+          </ul>
+        </section>
+        <section>
+          <h1>Available Tags</h1>
+          <ul id="tags">
+            {% for tag in tags %}
+            <li style="background-color:{{tag.fill_color}};color:{{tag.text_color}};border-color:{{tag.text_color}}">{{tag}}</li>
+            {% endfor %}
+          </ul>
+      </div>
+    </main>
+  </body>
+</html>
