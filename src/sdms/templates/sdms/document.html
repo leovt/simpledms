@@ -17,18 +17,18 @@
         <a>Logout</a>
       </nav>
     </header>
-    <main>
+    <main class="document">
       <div id="preview">
         <img src="{% url 'preview' document.id 1 %}"></img>
       </div>
       <div id="attributes">
         <section>
           <h1>Document Properties</h1>
-          <p>ID: {{document.id}}</p>
-          <p>Subject: <span class="subject">The subject of the document</span></p>
-          <p>99 pages</p>
-          <p>Date: 2022-02-14</p>
-          <p>Document Type: Letter</p>
+          <p>ID: {{document.id}} created {{document.created_at}}</p>
+          <p>Subject: <span class="subject">{{document.subject}}</span></p>
+          <p>Status: {{document.status}}</p>
+          <p>{{document.pages}} pages</p>
+          <p>Date: {{document.document_date}}</p>
         </section>
         <section>
           <h1>Selected Tags</h1>
@@ -45,6 +45,13 @@
             <li style="background-color:{{tag.fill_color}};color:{{tag.text_color}};border-color:{{tag.text_color}}">{{tag}}</li>
             {% endfor %}
           </ul>
+        </section>
+        <section>
+          <h1>Text</h1>
+          <pre>{{document.pdf_text}}</pre>
+          <h1>OCR</h1>
+          <pre>{{document.ocr_text}}</pre>
+        </section>
       </div>
     </main>
   </body>

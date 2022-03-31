@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sdms Home</title>
+    <link rel="stylesheet" href="{% static 'sdms/sdms.css' %}">
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a>Inbox</a> <span class="badge">2</span>
+        <a>Search</a>
+        <a>Settings</a>
+        <a>Logout</a>
+      </nav>
+    </header>
+    <main>
+      <section>
+        <h1>Workflow Status</h1>
+      <div class="workflow">
+        <h1>Untreated</h1>
+        {{UT}} documents in queue.
+      </div>
+      <span class="arrow">&#10132;</span>
+      <div class="workflow">
+        <h1>Inbox</h1>
+        {{IN}} documents ready for classification.
+      </div>
+      <span class="arrow">&#10132;</span>
+      <div class="workflow">
+        <h1>Hold File</h1>
+        {{HF}} documents to be treated.
+      </div>
+      <span class="arrow">&#10132;</span>
+      <div class="workflow">
+        <h1>Archive</h1>
+        {{AR}} documents archived.
+      </div>
+      </section>
+      <section>
+        <h1>Search Documents</h1>
+        <input></input>
+      </section>
+    </main>
+  </body>
+</html>
