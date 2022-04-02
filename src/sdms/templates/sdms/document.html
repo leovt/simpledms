@@ -59,15 +59,17 @@
         </form>
         <section>
           <h1>Available Tags</h1>
-          <span class="tagbox">
+          <span class="tagbox" id="availabletags">
             {% for tag in form.tags %}
               <label for="{{ tag.id_for_label }}" class="tag T{{ tag.data.value }}" >{{ tag.choice_label }}</label>
             {% endfor %}
           </span>
-          <form>
+          <form id="newtagform" action="{% url 'addtag' %}" method="post">{% csrf_token %}
             <p>New Tag: <span class="tag" id="newtag" style="color:{{ tag_form.text_color.value }};background-color:{{ tag_form.fill_color.value}}">{{ tag_form.name }}: {{ tag_form.subtag }}</span></p>
             <p>{{ tag_form.fill_color.label_tag }}{{ tag_form.fill_color }}
             {{ tag_form.text_color.label_tag }}{{ tag_form.text_color }}</p>
+            <p><button type="submit">Add Tag</button></p>
+
             <script>
                 document.getElementById('{{ tag_form.fill_color.id_for_label }}').addEventListener('change', () => {
                   document.getElementById('newtag').style.backgroundColor = document.getElementById('{{ tag_form.fill_color.id_for_label }}').value;
@@ -92,5 +94,6 @@
         </section>
       </div>
     </main>
+    <script src="{% static 'sdms/newtag.js' %}"></script>
   </body>
 </html>

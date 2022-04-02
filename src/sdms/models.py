@@ -11,7 +11,7 @@ import pdf2image
 class Tag(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=30)
-    subtag = models.CharField(max_length=30)
+    subtag = models.CharField(max_length=30, blank=True)
     fill_color = models.CharField(max_length=7, default="#AFD9F3")
     text_color = models.CharField(max_length=7, default="#233038")
 
