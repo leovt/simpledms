@@ -12,6 +12,7 @@
     .T{{ tag.id }}{ background-color: {{tag.fill_color}}; color: {{tag.text_color}}; border-color: {{tag.border_color}};}
     {% endfor %}
     </style>
+    <script src="{% static 'sdms/color.js' %}"></script>
   </head>
   <body>
     <header>
@@ -34,12 +35,11 @@
             <p>created: {{document.created_at}}</p>
             <p>{{ document.pages }} pages</p>
             <p>{{ form.subject.errors }}{{ form.subject.label_tag }}{{ form.subject }}</p>
-            <p>{{ form.document_date.errors }}{{ form.document_date.label_tag }}{{ form.document_date }}</p>
-            <ul>
+            <p>{{ form.document_date.errors }}{{ form.document_date.label_tag }}{{ form.document_date }}
               {% for d in date_suggestions %}
-              <li><button type="button" onclick="document.getElementById('{{ form.document_date.id_for_label }}').value='{{ d|date:'Y-m-d' }}';">{{ d|date:'Y-m-d' }}</button></li>
+                <button type="button" onclick="document.getElementById('{{ form.document_date.id_for_label }}').value='{{ d|date:'Y-m-d' }}';">{{ d|date:'Y-m-d' }}</button></li>
               {% endfor %}
-            </ul>
+            </p>
             <p>{{ form.document_amount.errors }}{{ form.document_amount.label_tag }}{{ form.document_amount }}</p>
             <p>{{ form.tags.errors }}{{ form.tags.label_tag }}
             <span class="tagbox">
@@ -64,6 +64,23 @@
               <label for="{{ tag.id_for_label }}" class="tag T{{ tag.data.value }}" >{{ tag.choice_label }}</label>
             {% endfor %}
           </span>
+          <form>
+            <p>New Tag: <span class="tag" id="newtag" style="color:{{ tag_form.text_color.value }};background-color:{{ tag_form.fill_color.value}}">{{ tag_form.name }}: {{ tag_form.subtag }}</span></p>
+            <p>{{ tag_form.fill_color.label_tag }}{{ tag_form.fill_color }}
+            {{ tag_form.text_color.label_tag }}{{ tag_form.text_color }}</p>
+            <script>
+                document.getElementById('{{ tag_form.fill_color.id_for_label }}').addEventListener('change', () => {
+                  document.getElementById('newtag').style.backgroundColor = document.getElementById('{{ tag_form.fill_color.id_for_label }}').value;
+                  document.getElementById('newtag').style.borderColor = borderColor(document.getElementById('{{ tag_form.fill_color.id_for_label }}').value);
+                });
+                document.getElementById('{{ tag_form.text_color.id_for_label }}').addEventListener('change', () => {
+                  document.getElementById('newtag').style.color = document.getElementById('{{ tag_form.text_color.id_for_label }}').value;
+                });
+                document.getElementById('newtag').style.backgroundColor = document.getElementById('{{ tag_form.fill_color.id_for_label }}').value;
+                document.getElementById('newtag').style.borderColor = borderColor(document.getElementById('{{ tag_form.fill_color.id_for_label }}').value);
+                document.getElementById('newtag').style.color = document.getElementById('{{ tag_form.text_color.id_for_label }}').value;
+            </script>
+          </form>
         </section>
         <label for="showtext">Show recognized text in document</label>
         <input id="showtext" class="toggle" checked type="checkbox"></input>

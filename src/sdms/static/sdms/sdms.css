@@ -107,3 +107,10 @@ button[value="HF"]{
 .cbtag:checked + label {
   display: inline-block;
 }
+
+.tag > input {
+  background-color: inherit;
+  font: inherit;
+  color: inherit;
+  border: 1px solid black;
+}

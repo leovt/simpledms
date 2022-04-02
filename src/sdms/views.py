@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.db.models import Count
 
 from .models import Document, Tag
-from .forms import DocumentForm
+from .forms import DocumentForm, TagForm
 
 import pdf2image
 import dateparser.search
@@ -41,6 +41,7 @@ def document(request, document_id):
             })
     date_suggestions = guess_date(document.pdf_text + '\n\n' + document.ocr_text)
     tags = Tag.objects.all()
+    tag_form = TagForm()
     return render(request, 'sdms/document.html', locals())
 
 def preview(request, document_id, page):
