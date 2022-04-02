@@ -3,9 +3,10 @@ from django.http import HttpResponse
 from django.db.models import Count
 
 from .models import Document, Tag
-
+from .forms import DocumentForm
 
 import pdf2image
+import dateparser.search
 
 # Create your views here.
 def index(request):
@@ -17,9 +18,30 @@ def index(request):
 
     return render(request, 'sdms/index.html', count)
 
+def guess_date(text):
+    dates = set(dt.date() for x, dt in dateparser.search.search_dates(text, ['de']))
+    dates = [ x for x in dates if 1900 <= x.year <= 2100 ]
+    dates.sort()
+    return dates
+
+
 def document(request, document_id):
     document = get_object_or_404(Document, id=document_id)
-    return render(request, 'sdms/document.html', {'document': document, 'tags': Tag.objects.all()})
+    if request.method == 'POST':
+        form = DocumentForm(request.POST)
+        if form.is_valid():
+            pass
+            # return HttpResponseRedirect()
+    else:
+        form = DocumentForm(initial={
+            'tags': list(document.tags.all().values_list("id", flat=True)),
+            'subject': document.subject,
+            'document_date': document.document_date,
+            'document_amount': document.document_amount,
+            })
+    date_suggestions = guess_date(document.pdf_text + '\n\n' + document.ocr_text)
+    tags = Tag.objects.all()
+    return render(request, 'sdms/document.html', locals())
 
 def preview(request, document_id, page):
     document = get_object_or_404(Document, id=document_id)

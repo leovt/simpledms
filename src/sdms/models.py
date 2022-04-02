@@ -1,4 +1,5 @@
 import uuid
+import colorsys
 
 from django.db import models
 
@@ -19,6 +20,15 @@ class Tag(models.Model):
             return f'{self.name}: {self.subtag}'
         return self.name
 
+    @property
+    def border_color(self):
+        col = str(self.fill_color)
+        rgb = [int(col[i:i+2], 16) / 255.0 for i in (1,3,5)]
+        h,l,s = colorsys.rgb_to_hls(*rgb)
+        r,g,b = colorsys.hls_to_rgb(h, max(0, l-0.2), s)
+        return f'#{int(r*255):02x}{int(g*255):02x}{int(b*255):02x}'
+
+
 class Document(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     file = models.FileField()
@@ -33,7 +43,7 @@ class Document(models.Model):
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.UNTREATED)
 
     subject = models.CharField(max_length=200, blank=True)
-    tags = models.ManyToManyField(Tag, related_name='documents')
+    tags = models.ManyToManyField(Tag, related_name='documents', blank=True)
     document_date = models.DateField(null=True, blank=True)
     document_amount = models.DecimalField(max_digits=19, decimal_places=4, null=True, blank=True)
 

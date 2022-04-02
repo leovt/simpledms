@@ -39,7 +39,7 @@ div#attributes {
 div#preview > img {
 }
 
-#tags > li {
+.tag {
   display: inline-block;
   border-width: 3px;
   border-style: solid;
@@ -66,4 +66,44 @@ div#preview > img {
   background: #bbf;
   border-radius: 1em;
   padding: 2em;
+}
+
+.toggle {
+  display: none
+}
+
+.toggle:checked + * {
+  display: none;
+}
+
+button[type="submit"]{
+  padding: 1ex 2em;
+  font-weight: bold;
+  color: white;
+  border-radius: 30px;
+}
+
+button[value="AR"]{
+  background-color: green;
+}
+button[value="HF"]{
+  background-color: orangered;
+}
+
+.tagbox {
+  padding: 5px;
+  display: inline-block;
+  border: 1px solid black;
+  min-height: 5ex;
+  min-width: 20em;
+}
+
+.cbtag {
+  display: none;
+}
+.cbtag + label {
+   display: none;
+}
+.cbtag:checked + label {
+  display: inline-block;
 }

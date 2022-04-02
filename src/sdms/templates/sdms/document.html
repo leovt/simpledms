@@ -7,6 +7,11 @@
     <meta charset="UTF-8">
     <title>Document View</title>
     <link rel="stylesheet" href="{% static 'sdms/sdms.css' %}">
+    <style>
+    {% for tag in tags %}
+    .T{{ tag.id }}{ background-color: {{tag.fill_color}}; color: {{tag.text_color}}; border-color: {{tag.border_color}};}
+    {% endfor %}
+    </style>
   </head>
   <body>
     <header>
@@ -22,30 +27,46 @@
         <img src="{% url 'preview' document.id 1 %}"></img>
       </div>
       <div id="attributes">
-        <section>
-          <h1>Document Properties</h1>
-          <p>ID: {{document.id}} created {{document.created_at}}</p>
-          <p>Subject: <span class="subject">{{document.subject}}</span></p>
-          <p>Status: {{document.status}}</p>
-          <p>{{document.pages}} pages</p>
-          <p>Date: {{document.document_date}}</p>
-        </section>
-        <section>
-          <h1>Selected Tags</h1>
-          <ul id="tags">
-            {% for tag in document.tags.all %}
-            <li style="background-color:{{tag.fill_color}};color:{{tag.text_color}};border-color:{{tag.text_color}}">{{tag}}</li>
-            {% endfor %}
-          </ul>
-        </section>
+        <form method="post">{% csrf_token %}
+          <section>
+            <h1>Document Properties</h1>
+            <p>ID: {{document.id}}</p>
+            <p>created: {{document.created_at}}</p>
+            <p>{{ document.pages }} pages</p>
+            <p>{{ form.subject.errors }}{{ form.subject.label_tag }}{{ form.subject }}</p>
+            <p>{{ form.document_date.errors }}{{ form.document_date.label_tag }}{{ form.document_date }}</p>
+            <ul>
+              {% for d in date_suggestions %}
+              <li><button type="button" onclick="document.getElementById('{{ form.document_date.id_for_label }}').value='{{ d|date:'Y-m-d' }}';">{{ d|date:'Y-m-d' }}</button></li>
+              {% endfor %}
+            </ul>
+            <p>{{ form.document_amount.errors }}{{ form.document_amount.label_tag }}{{ form.document_amount }}</p>
+            <p>{{ form.tags.errors }}{{ form.tags.label_tag }}
+            <span class="tagbox">
+              {% for tag in form.tags %}
+                <input type="checkbox" class="cbtag" {% for name, value in tag.data.attrs.items %}{% if value is not False %} {{ name }}{% if value is not True %}="{{ value|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %}>
+                <label for="{{ tag.id_for_label }}" class="tag T{{ tag.data.value }}" >{{ tag.choice_label }}</label>
+              {% endfor %}
+            </span></p>
+          </section>
+          <section>
+            <h1>Process Document</h1>
+            <div>
+              <button name="{{ form.status.name }}" type="submit" value="HF">Save to Hold File</button>
+              <button name="{{ form.status.name }}" type="submit" value="AR">Save and Archive</button>
+            </div>
+          </section>
+        </form>
         <section>
           <h1>Available Tags</h1>
-          <ul id="tags">
-            {% for tag in tags %}
-            <li style="background-color:{{tag.fill_color}};color:{{tag.text_color}};border-color:{{tag.text_color}}">{{tag}}</li>
+          <span class="tagbox">
+            {% for tag in form.tags %}
+              <label for="{{ tag.id_for_label }}" class="tag T{{ tag.data.value }}" >{{ tag.choice_label }}</label>
             {% endfor %}
-          </ul>
+          </span>
         </section>
+        <label for="showtext">Show recognized text in document</label>
+        <input id="showtext" class="toggle" checked type="checkbox"></input>
         <section>
           <h1>Text</h1>
           <pre>{{document.pdf_text}}</pre>
