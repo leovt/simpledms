@@ -1,8 +1,9 @@
 from http import HTTPStatus
 
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.db.models import Count
+from django.urls import reverse
 
 from .models import Document, Tag
 from .forms import DocumentForm, TagForm
@@ -46,8 +47,20 @@ def document(request, document_id):
     if request.method == 'POST':
         form = DocumentForm(request.POST)
         if form.is_valid():
-            pass
-            # return HttpResponseRedirect()
+            document.subject = form.cleaned_data['subject']
+            document.document_date = form.cleaned_data['document_date']
+            document.document_amount = form.cleaned_data['document_amount']
+            document.status = form.cleaned_data['status']
+            document.tags.clear()
+            for tag in form.cleaned_data['tags']:
+                document.tags.add(tag)
+            document.save()
+            print(form.cleaned_data)
+            next_document_id = Document.objects.filter(status=Document.Status.INBOX).values_list('id').first()
+            if next_document_id:
+                return HttpResponseRedirect(reverse('document', args=(next_document_id[0],)))
+            else:
+                return HttpResponseRedirect(reverse('index'))
     else:
         form = DocumentForm(initial={
             'tags': list(document.tags.all().values_list("id", flat=True)),

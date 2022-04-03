@@ -44,7 +44,7 @@
             <p>{{ form.tags.errors }}{{ form.tags.label_tag }}
             <span class="tagbox">
               {% for tag in form.tags %}
-                <input type="checkbox" class="cbtag" {% for name, value in tag.data.attrs.items %}{% if value is not False %} {{ name }}{% if value is not True %}="{{ value|stringformat:'s' }}"{% endif %}{% endif %}{% endfor %}>
+                <input type="checkbox" class="cbtag" value="{{ tag.data.value }}" id="{{ tag.id_for_label }}" name="{{ tag.data.name }}" {% if tag.data.attrs.checked %}checked{% endif %}>
                 <label for="{{ tag.id_for_label }}" class="tag T{{ tag.data.value }}" >{{ tag.choice_label }}</label>
               {% endfor %}
             </span></p>
