@@ -64,6 +64,7 @@
             </div>
           </section>
         </form>
+        <hr></hr>
         <section>
           <h1>Available Tags</h1>
           <span class="tagbox" id="availabletags">
@@ -72,22 +73,19 @@
             {% endfor %}
           </span>
           <form id="newtagform" action="{% url 'addtag' %}" method="post">{% csrf_token %}
-            <p>New Tag: <span class="tag" id="newtag" style="color:{{ tag_form.text_color.value }};background-color:{{ tag_form.fill_color.value}}">{{ tag_form.name }}: {{ tag_form.subtag }}</span></p>
-            <p>{{ tag_form.fill_color.label_tag }}{{ tag_form.fill_color }}
-            {{ tag_form.text_color.label_tag }}{{ tag_form.text_color }}</p>
+            <p>New Tag: <span class="tag" id="newtag" style="color:{{ tag_form.text_color.value }};background-color:{{ tag_form.fill_color.value}}">{{ tag_form.name }}: {{ tag_form.subtag }}</span>
+            {{ tag_form.fill_color }}{{ tag_form.text_color }}</p>
             <p><button type="submit">Add Tag</button></p>
 
             <script>
-                document.getElementById('{{ tag_form.fill_color.id_for_label }}').addEventListener('change', () => {
+                function restyle_newtag () {
                   document.getElementById('newtag').style.backgroundColor = document.getElementById('{{ tag_form.fill_color.id_for_label }}').value;
                   document.getElementById('newtag').style.borderColor = borderColor(document.getElementById('{{ tag_form.fill_color.id_for_label }}').value);
-                });
-                document.getElementById('{{ tag_form.text_color.id_for_label }}').addEventListener('change', () => {
                   document.getElementById('newtag').style.color = document.getElementById('{{ tag_form.text_color.id_for_label }}').value;
-                });
-                document.getElementById('newtag').style.backgroundColor = document.getElementById('{{ tag_form.fill_color.id_for_label }}').value;
-                document.getElementById('newtag').style.borderColor = borderColor(document.getElementById('{{ tag_form.fill_color.id_for_label }}').value);
-                document.getElementById('newtag').style.color = document.getElementById('{{ tag_form.text_color.id_for_label }}').value;
+                };
+                document.getElementById('{{ tag_form.fill_color.id_for_label }}').addEventListener('change', restyle_newtag);
+                document.getElementById('{{ tag_form.text_color.id_for_label }}').addEventListener('change', restyle_newtag);
+                restyle_newtag();
             </script>
           </form>
         </section>
