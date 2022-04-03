@@ -1,4 +1,5 @@
 from http import HTTPStatus
+import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -36,10 +37,11 @@ def addtag(request):
         return JsonResponse({'errors': form.errors}, status=HTTPStatus.BAD_REQUEST)
 
 def guess_date(text):
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     dates = set(dt.date() for x, dt in dateparser.search.search_dates(text, ['de']))
-    dates = [ x for x in dates if 1900 <= x.year <= 2100 ]
+    dates = [ x for x in dates if 1900 <= x.year and x <= tomorrow ]
     dates.sort()
-    return dates
+    return dates[-5:]
 
 
 def document(request, document_id):
@@ -71,12 +73,15 @@ def document(request, document_id):
     date_suggestions = guess_date(document.pdf_text + '\n\n' + document.ocr_text)
     tags = Tag.objects.all()
     tag_form = TagForm()
+    page_range = range(1, 1+document.pages)
     return render(request, 'sdms/document.html', locals())
 
-def preview(request, document_id, page):
-    document = get_object_or_404(Document, id=document_id)
-    image = pdf2image.convert_from_path(document.file.path, first_page=page, last_page=page, dpi=100)[0]
-    response = HttpResponse()
-    response.headers['Content-Type']="image/png"
-    image.save(response, "PNG")
-    return response
+def page_image(dpi):
+    def view(request, document_id, page):
+        document = get_object_or_404(Document, id=document_id)
+        image = pdf2image.convert_from_path(document.file.path, first_page=page, last_page=page, dpi=dpi)[0]
+        response = HttpResponse()
+        response.headers['Content-Type']="image/png"
+        image.save(response, "PNG")
+        return response
+    return view

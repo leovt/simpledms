@@ -26,7 +26,6 @@ span.subject {
 
 div#preview {
   height: 100vh;
-  overflow: scroll;
   fill: grey;
   flex: 1
 }
@@ -34,9 +33,8 @@ div#preview {
 div#attributes {
   flex: 1;
   margin: 2em;
-}
-
-div#preview > img {
+  height: 90vh;
+  overflow-y: scroll
 }
 
 .tag {
@@ -126,4 +124,30 @@ button[value="HF"]{
      transform: scale(1);
      opacity: 1;
    }
+}
+
+#newtagform {
+  box-shadow: 1px 1px 4px gray;
+  padding: 2px 1em 2px 1em;
+  margin-bottom: 5px;
+  width: fit-content;
+}
+
+#pages {
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+img.pagetn{
+  margin: 5px;
+  border: 1px solid black;
+  box-shadow: 2px 2px 3px grey;
+}
+
+#pagebox {
+  overflow: scroll;
+  width: 50vw;
+  height: 80vh;
+}
+#page {
+  width:100%;
 }

@@ -25,7 +25,14 @@
     </header>
     <main class="document">
       <div id="preview">
-        <img src="{% url 'preview' document.id 1 %}"></img>
+        <div id="pages">
+          {% for p in page_range %}
+            <img src="{% url 'thumbnail' document.id p %}" class="pagetn" onclick="document.getElementById('page').src='{% url 'preview' document.id p %}';"></img>
+          {% endfor %}
+        </div>
+        <div id="pagebox">
+          <img src="{% url 'preview' document.id 1 %}" id="page"></img>
+        </div>
       </div>
       <div id="attributes">
         <form method="post">{% csrf_token %}
