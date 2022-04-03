@@ -2,6 +2,7 @@ import uuid
 import colorsys
 
 from django.db import models
+from django.urls import reverse
 
 import pdftotext
 import pytesseract
@@ -50,6 +51,9 @@ class Document(models.Model):
     pdf_text = models.TextField(blank=True, editable=False)
     ocr_text = models.TextField(blank=True, editable=False)
     pages = models.IntegerField(null=True, editable=False)
+
+    def get_absolute_url(self):
+        return reverse('document', args=(self.id,))
 
     def prepare(self):
         if self.status != Document.Status.UNTREATED:

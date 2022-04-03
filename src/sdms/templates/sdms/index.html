@@ -7,6 +7,8 @@
     <meta charset="UTF-8">
     <title>Sdms Home</title>
     <link rel="stylesheet" href="{% static 'sdms/sdms.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'sdms/upload.css' %}" />
+    <script src="{% static 'sdms/upload.js' %}"></script>
   </head>
   <body>
     <header>
@@ -25,25 +27,39 @@
         {{UT}} documents in queue.
       </div>
       <span class="arrow">&#10132;</span>
+      <a href="{% url 'inbox' %}">
       <div class="workflow">
         <h1>Inbox</h1>
         {{IN}} documents ready for classification.
-      </div>
+      </div></a>
       <span class="arrow">&#10132;</span>
+      <a href="{% url 'holdfile' %}">
       <div class="workflow">
         <h1>Hold File</h1>
         {{HF}} documents to be treated.
-      </div>
+      </div></a>
       <span class="arrow">&#10132;</span>
+      <a href="{% url 'archive' %}">
       <div class="workflow">
         <h1>Archive</h1>
         {{AR}} documents archived.
-      </div>
+      </div></a>
       </section>
       <section>
         <h1>Search Documents</h1>
-        <input></input>
+        <form action="{% url 'search' %}" method="get">
+        <input name="q"></input>
+        <button>Search</button>
+      </form>
       </section>
-    </main>
+      <section>
+        <h1>Upload Documents</h1>
+        <form action="{% url 'upload' %}" id="ulform" method="POST" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input class="ul_file" type="file" name="documents" id="file" multiple />
+          <label for="file"><strong>Choose files</strong><span class="ul_drop"> or drop here </span>.</label>
+        <button>Upload</button>
+      </form>
+      </section>    </main>
   </body>
 </html>

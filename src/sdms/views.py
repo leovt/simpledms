@@ -3,8 +3,10 @@ import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.urls import reverse
+from django.views.generic import ListView
+import django_tables2 as tables
 
 from .models import Document, Tag
 from .forms import DocumentForm, TagForm
@@ -38,7 +40,8 @@ def addtag(request):
 
 def guess_date(text):
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-    dates = set(dt.date() for x, dt in dateparser.search.search_dates(text, ['de']))
+    dates = dateparser.search.search_dates(text, ['de']) or []
+    dates = set(dt.date() for x, dt in dates)
     dates = [ x for x in dates if 1900 <= x.year and x <= tomorrow ]
     dates.sort()
     return dates[-5:]
@@ -73,7 +76,7 @@ def document(request, document_id):
     date_suggestions = guess_date(document.pdf_text + '\n\n' + document.ocr_text)
     tags = Tag.objects.all()
     tag_form = TagForm()
-    page_range = range(1, 1+document.pages)
+    page_range = range(1, 1+(document.pages or 0))
     return render(request, 'sdms/document.html', locals())
 
 def page_image(dpi):
@@ -85,3 +88,55 @@ def page_image(dpi):
         image.save(response, "PNG")
         return response
     return view
+
+
+from django.utils.html import format_html
+
+class ImageColumn(tables.Column):
+    def render(self, value):
+        return format_html(
+            '<img src="{url}" height="50px" alt="Thumbnail for document id {value}"></img>',
+            url=reverse('thumbnail', args=(value, 1)),
+            value=value
+        )
+
+class DocumentTable(tables.Table):
+    #id = tables.Column(linkify=True)
+    id = ImageColumn(linkify=True)
+    class Meta:
+        model = Document
+        template_name = "django_tables2/bootstrap.html"
+        fields = ("id", "status", "subject", "file", "pages", "document_date", "document_amount", "tags")
+
+class DocumentListView(tables.SingleTableView):
+    model = Document
+    table_class = DocumentTable
+    template_name = 'sdms/document_list.html'
+
+class InboxListView(DocumentListView):
+    def get_queryset(self):
+        return super().get_queryset().filter(status="IN")
+
+class HoldfileListView(DocumentListView):
+    def get_queryset(self):
+        return super().get_queryset().filter(status="HF")
+
+class ArchiveListView(DocumentListView):
+    def get_queryset(self):
+        return super().get_queryset().filter(status="AR")
+
+class SearchListView(DocumentListView):
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')
+        return super().get_queryset().filter(Q(pdf_text__icontains=query) | Q(ocr_text__icontains=query))
+
+def upload(request):
+    if request.method == "POST":
+        for file in request.FILES.getlist("documents"):
+            doc = Document(file=file)
+            doc.save()
+            # TODO: prepare in background task in order to have faster response
+            doc.prepare()
+        return HttpResponseRedirect(reverse('index'))
+    else:
+        return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)

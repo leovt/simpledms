@@ -1,0 +1,23 @@
+.ul_drop,
+.uploading,
+.success,
+.error {
+  display: none;
+}
+
+.ulform {
+	min-height: 200px;
+}
+
+.ulform.has-advanced-upload {
+  background-color: white;
+  outline: 2px dashed black;
+}
+
+.ulform.has-advanced-upload .ul_drop {
+  display: inline;
+}
+
+.ulform.isdragover {
+  background-color: grey;
+}
