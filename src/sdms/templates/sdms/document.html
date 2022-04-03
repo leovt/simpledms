@@ -42,7 +42,7 @@
             </p>
             <p>{{ form.document_amount.errors }}{{ form.document_amount.label_tag }}{{ form.document_amount }}</p>
             <p>{{ form.tags.errors }}{{ form.tags.label_tag }}
-            <span class="tagbox">
+            <span class="tagbox" id="doctags">
               {% for tag in form.tags %}
                 <input type="checkbox" class="cbtag" value="{{ tag.data.value }}" id="{{ tag.id_for_label }}" name="{{ tag.data.name }}" {% if tag.data.attrs.checked %}checked{% endif %}>
                 <label for="{{ tag.id_for_label }}" class="tag T{{ tag.data.value }}" >{{ tag.choice_label }}</label>
