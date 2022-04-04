@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Sdms Home</title>
+    <link rel="stylesheet" href="{% static 'sdms/sdms.css' %}">
+    {% block xhead %}{% endblock %}
+  </head>
+  <body>
+    {% block header %}
+    <header>
+      <nav>
+        <a href={% url 'inbox' %}>Inbox<span class="badge">{{ document_count.IN }}</span></a>
+        <a href={% url 'admin:index' %}>Admin</a>
+        Logged in as {{ user.get_username }}.
+        <a href={% url 'logout' %}>Logout</a>
+      </nav>
+    </header>
+    {% endblock %}
+    {% block main %}{% endblock %}
+  </body>
+</html>

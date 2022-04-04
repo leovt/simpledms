@@ -3,9 +3,12 @@ import datetime
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
-from django.db.models import Count, Q
+from django.db.models import Q
 from django.urls import reverse
 from django.views.generic import ListView
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 import django_tables2 as tables
 
 from .models import Document, Tag
@@ -15,15 +18,11 @@ import pdf2image
 import dateparser.search
 
 # Create your views here.
+@login_required
 def index(request):
-    count = {'UT': 0, 'IN': 0, 'HF': 0, 'AR': 0}
-    queryset = Document.objects.all().values('status').annotate(count=Count('status'))
-    count.update({x['status']: x['count'] for x in queryset})
+    return render(request, 'sdms/index.html')
 
-    print(count)
-
-    return render(request, 'sdms/index.html', count)
-
+@login_required
 def addtag(request):
     form = TagForm(request.POST)
     if form.is_valid():
@@ -47,6 +46,7 @@ def guess_date(text):
     return dates[-5:]
 
 
+@login_required
 def document(request, document_id):
     document = get_object_or_404(Document, id=document_id)
     if request.method == 'POST':
@@ -80,6 +80,7 @@ def document(request, document_id):
     return render(request, 'sdms/document.html', locals())
 
 def page_image(dpi):
+    @login_required
     def view(request, document_id, page):
         document = get_object_or_404(Document, id=document_id)
         image = pdf2image.convert_from_path(document.file.path, first_page=page, last_page=page, dpi=dpi)[0]
@@ -108,7 +109,7 @@ class DocumentTable(tables.Table):
         template_name = "django_tables2/bootstrap.html"
         fields = ("id", "status", "subject", "file", "pages", "document_date", "document_amount", "tags")
 
-class DocumentListView(tables.SingleTableView):
+class DocumentListView(LoginRequiredMixin, tables.SingleTableView):
     model = Document
     table_class = DocumentTable
     template_name = 'sdms/document_list.html'
@@ -130,6 +131,7 @@ class SearchListView(DocumentListView):
         query = self.request.GET.get('q', '')
         return super().get_queryset().filter(Q(pdf_text__icontains=query) | Q(ocr_text__icontains=query))
 
+@login_required
 def upload(request):
     if request.method == "POST":
         for file in request.FILES.getlist("documents"):

@@ -1,48 +1,36 @@
-<!DOCTYPE html>
-
+{% extends 'sdms/base.html' %}
 {% load static %}
 
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Sdms Home</title>
-    <link rel="stylesheet" href="{% static 'sdms/sdms.css' %}">
+{% block xhead %}
     <link rel="stylesheet" type="text/css" href="{% static 'sdms/upload.css' %}" />
     <script src="{% static 'sdms/upload.js' %}"></script>
-  </head>
-  <body>
-    <header>
-      <nav>
-        <a>Inbox</a> <span class="badge">2</span>
-        <a>Search</a>
-        <a>Settings</a>
-        <a>Logout</a>
-      </nav>
-    </header>
+{% endblock %}
+
+{% block main %}
     <main>
       <section>
         <h1>Workflow Status</h1>
       <div class="workflow">
         <h1>Untreated</h1>
-        {{UT}} documents in queue.
+        {{document_count.UT}} documents in queue.
       </div>
       <span class="arrow">&#10132;</span>
       <a href="{% url 'inbox' %}">
       <div class="workflow">
         <h1>Inbox</h1>
-        {{IN}} documents ready for classification.
+        {{document_count.IN}} documents ready for classification.
       </div></a>
       <span class="arrow">&#10132;</span>
       <a href="{% url 'holdfile' %}">
       <div class="workflow">
         <h1>Hold File</h1>
-        {{HF}} documents to be treated.
+        {{document_count.HF}} documents to be treated.
       </div></a>
       <span class="arrow">&#10132;</span>
       <a href="{% url 'archive' %}">
       <div class="workflow">
         <h1>Archive</h1>
-        {{AR}} documents archived.
+        {{document_count.AR}} documents archived.
       </div></a>
       </section>
       <section>
@@ -60,6 +48,6 @@
           <label for="file"><strong>Choose files</strong><span class="ul_drop"> or drop here </span>.</label>
         <button>Upload</button>
       </form>
-      </section>    </main>
-  </body>
-</html>
+      </section>
+    </main>
+{% endblock %}
