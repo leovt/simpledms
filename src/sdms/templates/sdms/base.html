@@ -13,6 +13,7 @@
     {% block header %}
     <header>
       <nav>
+        <a href={% url 'index' %}>SDMS</a>
         <a href={% url 'inbox' %}>Inbox<span class="badge">{{ document_count.IN }}</span></a>
         <a href={% url 'admin:index' %}>Admin</a>
         Logged in as {{ user.get_username }}.
@@ -21,5 +22,6 @@
     </header>
     {% endblock %}
     {% block main %}{% endblock %}
+    {% block footer %}{% endblock %}
   </body>
 </html>

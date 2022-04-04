@@ -1,28 +1,16 @@
-<!DOCTYPE html>
-
+{% extends 'sdms/base.html' %}
 {% load static %}
 
-<html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Document View</title>
-    <link rel="stylesheet" href="{% static 'sdms/sdms.css' %}">
-    <style>
-    {% for tag in tags %}
-    .T{{ tag.id }}{ background-color: {{tag.fill_color}}; color: {{tag.text_color}}; border-color: {{tag.border_color}};}
-    {% endfor %}
-    </style>
-    <script src="{% static 'sdms/color.js' %}"></script>
-  </head>
-  <body>
-    <header>
-      <nav>
-        <a>Inbox</a> <span class="badge">2</span>
-        <a>Search</a>
-        <a>Settings</a>
-        <a>Logout</a>
-      </nav>
-    </header>
+{% block xhead %}
+<style>
+{% for tag in tags %}
+.T{{ tag.id }}{ background-color: {{tag.fill_color}}; color: {{tag.text_color}}; border-color: {{tag.border_color}};}
+{% endfor %}
+</style>
+<script src="{% static 'sdms/color.js' %}"></script>
+{% endblock %}
+
+{% block main %}
     <main class="document">
       <div id="preview">
         <div id="pages">
@@ -99,6 +87,7 @@
         </section>
       </div>
     </main>
+{% endblock %}
+{% block footer %}
     <script src="{% static 'sdms/newtag.js' %}"></script>
-  </body>
-</html>
+{% endblock %}
