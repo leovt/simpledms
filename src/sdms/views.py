@@ -8,8 +8,10 @@ from django.urls import reverse
 from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.conf import settings
 
 import django_tables2 as tables
+from django_sendfile import sendfile
 
 from .models import Document, Tag
 from .forms import DocumentForm, TagForm
@@ -142,3 +144,7 @@ def upload(request):
         return HttpResponseRedirect(reverse('index'))
     else:
         return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+@login_required
+def media(request, path):
+    return sendfile(request, settings.MEDIA_ROOT / path)

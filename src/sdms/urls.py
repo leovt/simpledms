@@ -14,4 +14,5 @@ urlpatterns = [
     path('search', views.SearchListView.as_view(), name="search"),
     path('upload', views.upload, name="upload"),
     path('tags/add', views.addtag, name='addtag'),
+    path('media/<str:path>', views.media, name='media'),
 ]
