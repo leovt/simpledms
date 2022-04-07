@@ -139,8 +139,6 @@ def upload(request):
         for file in request.FILES.getlist("documents"):
             doc = Document(file=file)
             doc.save()
-            # TODO: prepare in background task in order to have faster response
-            doc.prepare()
         return HttpResponseRedirect(reverse('index'))
     else:
         return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -148,3 +146,15 @@ def upload(request):
 @login_required
 def media(request, path):
     return sendfile(request, settings.MEDIA_ROOT / path)
+
+@login_required
+def upload_api(request):
+    if request.method == "POST":
+        doc_ids = []
+        for file in request.FILES.getlist("documents"):
+            doc = Document(file=file)
+            doc.save()
+            doc_ids.append(doc.id)
+        return JsonResponse({'document_ids': doc_ids})
+    else:
+        return HttpResponse(status=HTTPStatus.METHOD_NOT_ALLOWED)

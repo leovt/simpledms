@@ -40,6 +40,7 @@ class Document(models.Model):
         INBOX = 'IN', 'Inbox'
         HOLDFILE = 'HF', 'Hold File'
         ARCHIVE = 'AR', 'Archive'
+        ERROR = 'ER', 'Error'
 
     status = models.CharField(max_length=2, choices=Status.choices, default=Status.UNTREATED)
 
