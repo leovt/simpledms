@@ -1,5 +1,6 @@
 import uuid
 import colorsys
+import tempfile
 
 from django.db import models
 from django.urls import reverse
@@ -65,9 +66,10 @@ class Document(models.Model):
             self.pages = len(pdf)
             self.pdf_text = '\n\n'.join(pdf)
 
-        images = pdf2image.convert_from_path(self.file.path, dpi=300)
-        print(images)
-        self.ocr_text = '\n\n'.join(pytesseract.image_to_string(image, 'deu') for image in images)
+
+        with tempfile.TemporaryDirectory() as path:
+            images = pdf2image.convert_from_path(self.file.path, dpi=300, output_folder=path)
+            self.ocr_text = '\n\n'.join(pytesseract.image_to_string(image, 'deu') for image in images)
 
         self.status = Document.Status.INBOX
         self.save()
