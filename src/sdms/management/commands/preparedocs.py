@@ -17,10 +17,13 @@ class Command(BaseCommand):
                 document = Document.objects.filter(status=Document.Status.UNTREATED).first()
                 if document is not None:
                     try:
-                        document.prepare()
-                    except Exception:
+                        self.stdout.write(f'Preparing {document}...')
                         document.status = Document.Status.ERROR
                         document.save()
+                        document.prepare()
+                        self.stdout.write(f'Preparing {document} ... DONE.')
+                    except Exception:
+                        self.stdout.write(f'Preparing {document} ... FAIL.')
                         raise
                 else:
                     time.sleep(10)
