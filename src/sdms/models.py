@@ -58,9 +58,6 @@ class Document(models.Model):
         return reverse('document', args=(self.id,))
 
     def prepare(self):
-        if self.status != Document.Status.UNTREATED:
-            return
-
         with open(self.file.path, "rb") as f:
             pdf = pdftotext.PDF(f)
             self.pages = len(pdf)
