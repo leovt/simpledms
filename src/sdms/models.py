@@ -54,6 +54,11 @@ class Document(models.Model):
     ocr_text = models.TextField(blank=True, editable=False)
     pages = models.IntegerField(null=True, editable=False)
 
+    def __str__(self):
+        if self.subject:
+            return f'Document {self.id} {self.file} "{self.subject}" ({self.status})'
+        return f'Document {self.id} {self.file} ({self.status})'
+
     def get_absolute_url(self):
         return reverse('document', args=(self.id,))
 
@@ -63,10 +68,12 @@ class Document(models.Model):
             self.pages = len(pdf)
             self.pdf_text = '\n\n'.join(pdf)
 
-
+        ocr_pages = []
         with tempfile.TemporaryDirectory() as path:
-            images = pdf2image.convert_from_path(self.file.path, dpi=300, output_folder=path)
-            self.ocr_text = '\n\n'.join(pytesseract.image_to_string(image, 'deu') for image in images)
+            for page in range(1, self.pages+1):
+                images = pdf2image.convert_from_path(self.file.path, dpi=300, output_folder=path, first_page=page, last_page=page)
+                ocr_pages.extend(pytesseract.image_to_string(image, 'deu') for image in images)
+        self.ocr_text = '\n\n'.join(ocr_pages)
 
         self.status = Document.Status.INBOX
         self.save()
