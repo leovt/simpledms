@@ -21,6 +21,7 @@ class Command(BaseCommand):
                         document.status = Document.Status.ERROR
                         document.save()
                         document.prepare()
+                        document.make_thumbnail()
                         self.stdout.write(f'Preparing {document} ... DONE.')
                     except Exception:
                         self.stdout.write(f'Preparing {document} ... FAIL.')

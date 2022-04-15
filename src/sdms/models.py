@@ -1,6 +1,7 @@
 import uuid
 import colorsys
 import tempfile
+import io
 
 from django.db import models
 from django.urls import reverse
@@ -49,10 +50,14 @@ class Document(models.Model):
     tags = models.ManyToManyField(Tag, related_name='documents', blank=True)
     document_date = models.DateField(null=True, blank=True)
     document_amount = models.DecimalField(max_digits=19, decimal_places=4, null=True, blank=True)
+    counterparty = models.CharField(max_length=200, blank=True)
 
     pdf_text = models.TextField(blank=True, editable=False)
     ocr_text = models.TextField(blank=True, editable=False)
     pages = models.IntegerField(null=True, editable=False)
+    file_size = models.BigIntegerField(null=True, editable=False)
+    file_hash_sha1 = models.CharField(max_length=40, null=True, editable=False)
+    thumbnail = models.BinaryField(null=True)
 
     def __str__(self):
         if self.subject:
@@ -76,4 +81,12 @@ class Document(models.Model):
         self.ocr_text = '\n\n'.join(ocr_pages)
 
         self.status = Document.Status.INBOX
+        self.save()
+
+    def make_thumbnail(self):
+        with tempfile.TemporaryDirectory() as path:
+            image = pdf2image.convert_from_path(self.file.path, size=64, output_folder=path, first_page=1, last_page=1)[0]
+        buffer = io.BytesIO()
+        image.save(buffer, format='PNG')
+        self.thumbnail = buffer.getvalue()
         self.save()

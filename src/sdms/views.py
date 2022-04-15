@@ -1,5 +1,7 @@
 from http import HTTPStatus
 import datetime
+import base64
+import hashlib
 
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
@@ -9,6 +11,7 @@ from django.views.generic import ListView
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.conf import settings
+from django.template.defaultfilters import filesizeformat
 
 import django_tables2 as tables
 from django_sendfile import sendfile
@@ -55,6 +58,7 @@ def document(request, document_id):
         form = DocumentForm(request.POST)
         if form.is_valid():
             document.subject = form.cleaned_data['subject']
+            document.counterparty = form.cleaned_data['counterparty']
             document.document_date = form.cleaned_data['document_date']
             document.document_amount = form.cleaned_data['document_amount']
             document.status = form.cleaned_data['status']
@@ -88,28 +92,42 @@ def page_image(dpi):
         image = pdf2image.convert_from_path(document.file.path, first_page=page, last_page=page, dpi=dpi)[0]
         response = HttpResponse()
         response.headers['Content-Type']="image/png"
+        response.headers['Cache-Control'] = f'private, max-age={30*24*3600}'
         image.save(response, "PNG")
         return response
     return view
 
 
-from django.utils.html import format_html
+
+from django.utils.html import format_html, format_html_join
 
 class ImageColumn(tables.Column):
+    def render(self, record):
+        thumbnail = record.thumbnail
+        if thumbnail is None or thumbnail[:4] != b'\x89PNG':
+            return record.id
+        else:
+            return format_html(
+                '<img src="data:image/png;base64,{png}" height="50px" alt="{alt}" class="doctn"></img>',
+                png = base64.b64encode(thumbnail).decode('ascii'),
+                alt = record.id
+            )
+
+class TagsColumn(tables.ManyToManyColumn):
     def render(self, value):
-        return format_html(
-            '<img src="{url}" height="50px" alt="Thumbnail for document id {value}"></img>',
-            url=reverse('thumbnail', args=(value, 1)),
-            value=value
-        )
+        return format_html_join('', '<span class="smtag" style="color:{};background-color:{};border-color:{};">{}</span>', ((tag.text_color, tag.fill_color, tag.border_color, tag) for tag in value.all()))
 
 class DocumentTable(tables.Table):
     #id = tables.Column(linkify=True)
-    id = ImageColumn(linkify=True)
+    id = ImageColumn(linkify=True, verbose_name='Document')
+    tags = TagsColumn()
     class Meta:
         model = Document
         template_name = "django_tables2/bootstrap.html"
-        fields = ("id", "status", "subject", "file", "pages", "document_date", "document_amount", "tags")
+        fields = ("id", "status", "subject", "counterparty", "file", "file_size", "pages", "document_date", "document_amount", "tags")
+
+    def render_file_size(self, value):
+        return filesizeformat(value)
 
 class DocumentListView(LoginRequiredMixin, tables.SingleTableView):
     model = Document
@@ -137,7 +155,10 @@ class SearchListView(DocumentListView):
 def upload(request):
     if request.method == "POST":
         for file in request.FILES.getlist("documents"):
-            doc = Document(file=file)
+            hasher = hashlib.sha1()
+            for chunk in file.chunks():
+                hasher.update(chunk)
+            doc = Document(file=file, file_size=file.size, file_hash_sha1=hasher.hexdigest())
             doc.save()
         return HttpResponseRedirect(reverse('index'))
     else:

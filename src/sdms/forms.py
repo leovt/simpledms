@@ -6,7 +6,7 @@ from .models import Document, Tag
 class DocumentForm(ModelForm):
     class Meta:
         model = Document
-        fields = ['status', 'subject', 'tags', 'document_date', 'document_amount']
+        fields = ['status', 'subject', 'counterparty', 'tags', 'document_date', 'document_amount']
         widgets = {
             'tags': CheckboxSelectMultiple,
             'document_date': DateInput(attrs={'type': 'date'}),

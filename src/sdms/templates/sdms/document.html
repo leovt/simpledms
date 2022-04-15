@@ -27,9 +27,10 @@
           <section>
             <h1>Document Properties</h1>
             <p>ID: {{document.id}}</p>
-            <p>created: {{document.created_at}}</p>
-            <p>{{ document.pages }} pages</p>
+            <p><a href="{{ document.file.url }}">{{ document.file }}</a>, created: {{ document.created_at }}</p>
+            <p>{{ document.file.size|filesizeformat }}, {{ document.pages }} pages</p>
             <p>{{ form.subject.errors }}{{ form.subject.label_tag }}{{ form.subject }}</p>
+            <p>{{ form.counterparty.errors }}{{ form.counterparty.label_tag }}{{ form.counterparty }}</p>
             <p>{{ form.document_date.errors }}{{ form.document_date.label_tag }}{{ form.document_date }}
               {% for d in date_suggestions %}
                 <button type="button" onclick="document.getElementById('{{ form.document_date.id_for_label }}').value='{{ d|date:'Y-m-d' }}';">{{ d|date:'Y-m-d' }}</button></li>
