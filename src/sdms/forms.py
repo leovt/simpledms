@@ -1,4 +1,5 @@
 from django.forms import ModelForm, CheckboxSelectMultiple, DateInput, RadioSelect, TextInput
+from django import forms
 
 from .models import Document, Tag
 
@@ -23,3 +24,10 @@ class TagForm(ModelForm):
             'text_color': TextInput(attrs={'type': 'color'}),
             'fill_color': TextInput(attrs={'type': 'color'}),
         }
+
+class SearchForm(forms.Form):
+    q = forms.CharField(max_length=200, required=False)
+    date_from = forms.DateField(widget=DateInput(attrs={'type': 'date'}), required=False)
+    date_to = forms.DateField(widget=DateInput(attrs={'type': 'date'}), required=False)
+    #tags = forms.ModelMultipleChoiceField(Tag.objects, widget=CheckboxSelectMultiple, required=False)
+    tags = forms.ModelChoiceField(Tag.objects, required=False)

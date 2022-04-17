@@ -7,6 +7,9 @@
 
 {% block main %}
 <main>
+  {% if search_form %}
+  {% include 'sdms/search_form.html' %}
+  {% endif %}
   {% render_table table %}
 </main>
 {% endblock %}

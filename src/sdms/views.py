@@ -17,7 +17,7 @@ import django_tables2 as tables
 from django_sendfile import sendfile
 
 from .models import Document, Tag
-from .forms import DocumentForm, TagForm
+from .forms import DocumentForm, TagForm, SearchForm
 
 import pdf2image
 import dateparser.search
@@ -25,7 +25,7 @@ import dateparser.search
 # Create your views here.
 @login_required
 def index(request):
-    return render(request, 'sdms/index.html')
+    return render(request, 'sdms/index.html', {'search_form': SearchForm()})
 
 @login_required
 def addtag(request):
@@ -148,8 +148,26 @@ class ArchiveListView(DocumentListView):
 
 class SearchListView(DocumentListView):
     def get_queryset(self):
-        query = self.request.GET.get('q', '')
-        return super().get_queryset().filter(Q(pdf_text__icontains=query) | Q(ocr_text__icontains=query))
+        form = SearchForm(self.request.GET)
+        queryset = super().get_queryset()
+        if form.is_valid():
+            if form.cleaned_data['q']:
+                query = form.cleaned_data['q']
+                queryset = queryset.filter(Q(pdf_text__icontains=query) | Q(ocr_text__icontains=query))
+            if form.cleaned_data['date_from']:
+                queryset = queryset.filter(document_date__gte=form.cleaned_data['date_from'])
+            if form.cleaned_data['date_to']:
+                queryset = queryset.filter(document_date__lte=form.cleaned_data['date_to'])
+            if form.cleaned_data['date_to']:
+                queryset = queryset.filter(document_date__lte=form.cleaned_data['date_to'])
+            if form.cleaned_data['tags']:
+                queryset = queryset.filter(tags=form.cleaned_data['tags'])
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_form'] = SearchForm(self.request.GET)
+        return context
 
 @login_required
 def upload(request):

@@ -35,10 +35,7 @@
       </section>
       <section>
         <h1>Search Documents</h1>
-        <form action="{% url 'search' %}" method="get">
-        <input name="q"></input>
-        <button>Search</button>
-      </form>
+        {% include 'sdms/search_form.html' %}
       </section>
       <section>
         <h1>Upload Documents</h1>
